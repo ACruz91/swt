@@ -84,12 +84,27 @@ public class Matriz {
 	}
 
 	public void setMatriz(int[][] nMatriz, int nFilas, int nColumnas) {
+		int cont = 0;
+		int nMin, nMax;
+		nMin = nMax = 0;
 		matriz = new int[nFilas][nColumnas];
 		for (int i = 0; i < nFilas; i++) {
 			for (int j = 0; j < nColumnas; j++) {
 				matriz[i][j] = nMatriz[i][j];
+				if (cont <= 0) {
+					nMin = nMax = matriz[0][0];
+					cont++;
+				}
+				if (nMin > matriz[i][j]) {
+					nMin = matriz[i][j];
+				}
+				if (nMax < matriz[i][j]) {
+					nMax = matriz[i][j];
+				}
 			}
 		}
+		setMinimo(nMin);
+		setMaximo(nMax);
 	}
 
 	public void leer(String fichero) {
