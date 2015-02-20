@@ -1,5 +1,7 @@
 package matriz;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -26,15 +28,16 @@ import org.eclipse.swt.widgets.Text;
 class Interfaz {
 	Display display;
 	Shell shell;
-	int indice;
 
 	public void menu() {
 		// Parámetros
 		Menu menuBar, menuArchivo, menuVisualizacion;
 		MenuItem menuArchivoCabecera, menuVisualizacionCabecera;
 		MenuItem menuArchivoNuevo, menuArchivoGuardar, menuArchivoSalir, menuArchivoAbrir, menuVisualizacionEstadisticas;
+		ArrayList<int[][]> arrayListMatriz = new ArrayList<int[][]>();
+		ArrayList<Integer> arrayListFilas = new ArrayList<Integer>();
+		ArrayList<Integer> arrayListColumnas = new ArrayList<Integer>();
 		Matriz obj = new Matriz();
-		indice = 0;
 
 		// Creación del display y shell
 		Display display = new Display();
@@ -44,6 +47,18 @@ class Interfaz {
 		shell.setText("Ejercicio SWT");
 		shell.setMaximized(true);
 
+		// Creación del CTabFolder para las pestañas
+		CTabFolder folder = new CTabFolder(shell, SWT.BORDER);
+		folder.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				// Esta parte del código sirve para ayudar a la ventana de las
+				// estadísticas que datos debe de retonar
+				// porque en el caso de que se clickea en los items del
+				// ctabfolder no se muestras para poder verse debe de
+				// clickearse en la tabla
+
+			}
+		});
 		// FillLayout
 		FillLayout fillLayout = new FillLayout(SWT.HORIZONTAL);
 		fillLayout.marginWidth = 5;
@@ -56,11 +71,53 @@ class Interfaz {
 		tableMatrices.setHeaderVisible(true);
 		tableMatrices.setLinesVisible(true);
 		TableColumn column1 = new TableColumn(tableMatrices, SWT.NONE);
-		column1.setText("Columna");
+		column1.setText("Índice de Matrices");
 		column1.setWidth(700);
+		tableMatrices.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				int indice = 0;
+				int indiceFolder = 0;
 
-		// Creación del CTabFolder para las pestañas
-		CTabFolder folder = new CTabFolder(shell, SWT.BORDER);
+				// Creación de la Tabla para que se muestre
+				Table table = new Table(folder, SWT.BORDER | SWT.MULTI);
+				indice = tableMatrices.getSelectionIndex();
+				System.out.println(indice);
+
+				// Obtenemos los datos para retornar nuestra Matriz de las
+				// arrays.
+				obj.setMatriz(arrayListMatriz.get(indice),
+						arrayListFilas.get(indice),
+						arrayListColumnas.get(indice));
+
+				// Creación de Columnas
+				for (int j = 0; j < arrayListColumnas.get(indice); j++) {
+					TableColumn column = new TableColumn(table, SWT.BORDER
+							| SWT.MULTI | SWT.V_SCROLL);
+					column.setText((Integer.toString(j)));
+					column.setWidth(30);
+				}
+
+				// Creación de la Matriz
+				for (int i = 0; i < arrayListFilas.get(indice); i++) {
+					TableItem item = new TableItem(table, SWT.NONE);
+					for (int j = 0; j < arrayListColumnas.get(indice); j++) {
+						item.setText(j, Integer.toString(obj.getMatriz(i, j)));
+					}
+				}
+
+				// Creación del Item para el CTabItem, contiene un
+				// índice que indica el número de Matriz
+				CTabItem item = new CTabItem(folder, SWT.CLOSE);
+				indiceFolder = indice + 1;
+				item.setText("Matriz " + indiceFolder);
+				item.setControl(table);
+
+				// Asignación
+				obj.setFilas(arrayListFilas.get(indice));
+				obj.setColumnas(arrayListColumnas.get(indice));
+
+			}
+		});
 
 		// Creación del Menú
 		menuBar = new Menu(shell, SWT.BAR);
@@ -151,7 +208,7 @@ class Interfaz {
 						obj.crear(nFilas, nColumnas);
 
 						// Creación de Columnas
-						for (int j = 0; j < nColumnas; j++) {
+						for (int j = 0; j < obj.getColumnas(); j++) {
 							TableColumn column = new TableColumn(table,
 									SWT.NONE);
 							column.setText((Integer.toString(j)));
@@ -160,27 +217,32 @@ class Interfaz {
 
 						// Creación de Filas, que se rellenan con la Matriz
 						// creada
-						for (int i = 0; i < nFilas; i++) {
+						for (int i = 0; i < obj.getFilas(); i++) {
 							TableItem item = new TableItem(table, SWT.NONE);
-							for (int j = 0; j < nColumnas; j++) {
+							for (int j = 0; j < obj.getFilas(); j++) {
 								item.setText(j,
 										Integer.toString(obj.getMatriz(i, j)));
 							}
 						}
 
+						// Añadimos en nuestros vectores los datos que queremos
+						// retornar
+						arrayListMatriz.add(obj.getMatrizEntera());
+						arrayListFilas.add(obj.getFilas());
+						arrayListColumnas.add(obj.getColumnas());
+
 						// Creación del Item de la Tabla "Arbol" tableMatrices
 						TableItem itemMatrices = new TableItem(tableMatrices,
 								SWT.NONE);
-						itemMatrices.setText("Nueva Matriz " + indice);
+						itemMatrices.setText("Nueva Matriz "
+								+ arrayListMatriz.size());
 
 						// Creación del Item para el CTabItem, contiene un
 						// índice que indica el número de Matriz
-						CTabItem item = new CTabItem(folder, SWT.CLOSE);
-						item.setText("Matriz " + indice);
+						CTabItem item = new CTabItem(folder, SWT.NONE);
+						item.setText("Matriz " + arrayListMatriz.size());
 						item.setControl(table);
-						
-						// Se incrementa el índice después de una nueva creación
-						indice++;
+
 						nuevo.close();
 					}
 
@@ -239,15 +301,21 @@ class Interfaz {
 					}
 
 					// Creación del Item de la Tabla "Arbol" tableMatrices
-					indice++;
 					TableItem itemMatrices = new TableItem(tableMatrices,
 							SWT.NONE);
-					itemMatrices.setText("Matriz cargada en la ruta " + fichero);
+					itemMatrices
+							.setText("Matriz cargada en la ruta " + fichero);
 
 					// Creación del Item del TabItem
 					CTabItem item = new CTabItem(folder, SWT.CLOSE);
 					item.setText(fichero);
 					item.setControl(table);
+
+					// Añadimos en nuestros vectores los datos que queremos
+					// retornar
+					arrayListMatriz.add(obj.getMatrizEntera());
+					arrayListFilas.add(obj.getFilas());
+					arrayListColumnas.add(obj.getColumnas());
 
 				}
 
@@ -308,7 +376,7 @@ class Interfaz {
 				new Label(estadisticas, SWT.NONE).setText(Integer.toString(obj
 						.getFilas()));
 				new Label(estadisticas, SWT.NONE)
-				.setText("Número de Columnas: ");
+						.setText("Número de Columnas: ");
 				new Label(estadisticas, SWT.NONE).setText(Integer.toString(obj
 						.getColumnas()));
 				new Label(estadisticas, SWT.NONE).setText("Número Mínimo: ");

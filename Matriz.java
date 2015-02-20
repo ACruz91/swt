@@ -42,6 +42,10 @@ public class Matriz {
 	}
 
 	/* Metodos Get */
+	public int[][] getMatrizEntera() {
+		return this.matriz;
+	}
+
 	public int getMatriz(int nFilas, int nColumnas) {
 		return this.matriz[nFilas][nColumnas];
 	}
@@ -77,6 +81,15 @@ public class Matriz {
 
 	public void setMaximo(int nMax) {
 		max = nMax;
+	}
+
+	public void setMatriz(int[][] nMatriz, int nFilas, int nColumnas) {
+		matriz = new int[nFilas][nColumnas];
+		for (int i = 0; i < nFilas; i++) {
+			for (int j = 0; j < nColumnas; j++) {
+				matriz[i][j] = nMatriz[i][j];
+			}
+		}
 	}
 
 	public void leer(String fichero) {
@@ -190,5 +203,34 @@ public class Matriz {
 				e2.printStackTrace();
 			}
 		}
+	}
+
+	public void mostrar() {
+		int min, max;
+		min = max = matriz[0][0];
+		System.out.println("---- Matriz ---------------");
+		System.out.println(" ");
+		for (int i = 0; i < filas; i++) {
+			System.out.print("|");
+			for (int j = 0; j < columnas; j++) {
+				if (min > matriz[i][j]) {
+					min = matriz[i][j];
+				}
+				if (max < matriz[i][j]) {
+					max = matriz[i][j];
+				}
+				System.out.print(" " + matriz[i][j]);
+				System.out.print("  ");
+			}
+			System.out.print("|");
+			System.out.println(" ");
+		}
+		System.out.println("");
+		System.out.println("---- Estadísticas ---------");
+		System.out.println("---- Número Máximo: " + max);
+		System.out.println("---- Número Mínimo: " + min);
+		System.out.println("---- Número de Filas: " + filas);
+		System.out.println("---- Número de Columnas: " + columnas);
+		System.out.println("---------------------------");
 	}
 }
