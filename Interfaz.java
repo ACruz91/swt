@@ -26,99 +26,13 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 class Interfaz {
-	Display display;
-	Shell shell;
+	private Shell shell;
+	private Menu menuBar, menuArchivo, menuVisualizacion;
+	private MenuItem menuArchivoCabecera, menuVisualizacionCabecera;
+	private MenuItem menuArchivoNuevo, menuArchivoGuardar, menuArchivoSalir,
+	menuArchivoAbrir, menuVisualizacionEstadisticas;
 
-	public void menu() {
-		// Parámetros
-		Menu menuBar, menuArchivo, menuVisualizacion;
-		MenuItem menuArchivoCabecera, menuVisualizacionCabecera;
-		MenuItem menuArchivoNuevo, menuArchivoGuardar, menuArchivoSalir, menuArchivoAbrir, menuVisualizacionEstadisticas;
-		ArrayList<int[][]> arrayListMatriz = new ArrayList<int[][]>();
-		ArrayList<Integer> arrayListFilas = new ArrayList<Integer>();
-		ArrayList<Integer> arrayListColumnas = new ArrayList<Integer>();
-		Matriz obj = new Matriz();
-
-		// Creación del display y shell
-		Display display = new Display();
-		Shell shell = new Shell(display);
-
-		// Parámetros Ventana
-		shell.setText("Ejercicio SWT");
-		shell.setMaximized(true);
-
-		// Creación del CTabFolder para las pestañas
-		CTabFolder folder = new CTabFolder(shell, SWT.BORDER);
-		folder.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				// Esta parte del código sirve para ayudar a la ventana de las
-				// estadísticas que datos debe de retonar
-				// porque en el caso de que se clickea en los items del
-				// ctabfolder no se muestras para poder verse debe de
-				// clickearse en la tabla
-
-			}
-		});
-		// FillLayout
-		FillLayout fillLayout = new FillLayout(SWT.HORIZONTAL);
-		fillLayout.marginWidth = 5;
-		fillLayout.marginHeight = 5;
-		fillLayout.spacing = 50;
-		shell.setLayout(fillLayout);
-
-		// Creación de una Tabla que será el "Arbol" de las Matrices
-		Table tableMatrices = new Table(shell, SWT.BORDER);
-		tableMatrices.setHeaderVisible(true);
-		tableMatrices.setLinesVisible(true);
-		TableColumn column1 = new TableColumn(tableMatrices, SWT.NONE);
-		column1.setText("Índice de Matrices");
-		column1.setWidth(700);
-		tableMatrices.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				int indice = 0;
-				int indiceFolder = 0;
-
-				// Creación de la Tabla para que se muestre
-				Table table = new Table(folder, SWT.BORDER | SWT.MULTI);
-				indice = tableMatrices.getSelectionIndex();
-				System.out.println(indice);
-
-				// Obtenemos los datos para retornar nuestra Matriz de las
-				// arrays.
-				obj.setMatriz(arrayListMatriz.get(indice),
-						arrayListFilas.get(indice),
-						arrayListColumnas.get(indice));
-
-				// Creación de Columnas
-				for (int j = 0; j < arrayListColumnas.get(indice); j++) {
-					TableColumn column = new TableColumn(table, SWT.BORDER
-							| SWT.MULTI | SWT.V_SCROLL);
-					column.setText((Integer.toString(j)));
-					column.setWidth(30);
-				}
-
-				// Creación de la Matriz
-				for (int i = 0; i < arrayListFilas.get(indice); i++) {
-					TableItem item = new TableItem(table, SWT.NONE);
-					for (int j = 0; j < arrayListColumnas.get(indice); j++) {
-						item.setText(j, Integer.toString(obj.getMatriz(i, j)));
-					}
-				}
-
-				// Creación del Item para el CTabItem, contiene un
-				// índice que indica el número de Matriz
-				CTabItem item = new CTabItem(folder, SWT.CLOSE);
-				indiceFolder = indice + 1;
-				item.setText("Matriz " + indiceFolder);
-				item.setControl(table);
-
-				// Asignación
-				obj.setFilas(arrayListFilas.get(indice));
-				obj.setColumnas(arrayListColumnas.get(indice));
-
-			}
-		});
-
+	public void menu(Shell shell) {
 		// Creación del Menú
 		menuBar = new Menu(shell, SWT.BAR);
 
@@ -164,9 +78,14 @@ class Interfaz {
 		menuVisualizacionEstadisticas.setText("&Estadísticas\t CTRL+N");
 		menuVisualizacionEstadisticas.setAccelerator(SWT.CTRL + 'E');
 
-		// Funciones
+		shell.setMenuBar(menuBar);
 
-		// Funcion nuevo, Crea una nueva Matriz
+	}
+
+	public void funcionesMenu(ArrayList<int[][]> arrayListMatriz,
+			ArrayList<Integer> arrayListFilas,
+			ArrayList<Integer> arrayListColumnas, CTabFolder folder,
+			Matriz obj, Table tableMatrices) {
 		class nuevo implements SelectionListener {
 			public void widgetSelected(SelectionEvent event) {
 				// Creación de una Shell hija llamada "nuevo" para el nuevo
@@ -177,13 +96,13 @@ class Interfaz {
 				nuevo.setSize(300, 120);
 				nuevo.setText("Nuevo");
 
-				// Creación de Tabla para mostrar la Matriz en el folder
-				Table table = new Table(folder, SWT.BORDER | SWT.MULTI);
-
-				// Layout
+				// Layout de la Ventana
 				nuevo.setLayout(new GridLayout(3, true));
 				GridData gridData = new GridData(GridData.CENTER);
 				gridData.horizontalSpan = 2;
+
+				// Creación de Tabla para mostrar la Matriz en el folder
+				Table table = new Table(folder, SWT.BORDER | SWT.MULTI);
 
 				// Creación del Label y Text para pedir las nFilas
 				Label labelFilas = new Label(nuevo, SWT.LEFT);
@@ -203,9 +122,11 @@ class Interfaz {
 				buttonAceptar.setText("Aceptar");
 				buttonAceptar.addSelectionListener(new SelectionListener() {
 					public void widgetSelected(SelectionEvent event) {
-						int nFilas = Integer.parseInt(textFilas.getText());
-						int nColumnas = Integer.parseInt(textColumnas.getText());
-						obj.crear(nFilas, nColumnas);
+						// Obtenemos nFilas y nColumnas de los Text y creamos la
+						// Matriz
+						obj.setFilas(Integer.parseInt(textFilas.getText()));
+						obj.setColumnas(Integer.parseInt(textColumnas.getText()));
+						obj.crear(obj.getFilas(), obj.getColumnas());
 
 						// Creación de Columnas
 						for (int j = 0; j < obj.getColumnas(); j++) {
@@ -231,15 +152,14 @@ class Interfaz {
 						arrayListFilas.add(obj.getFilas());
 						arrayListColumnas.add(obj.getColumnas());
 
-						// Creación del Item de la Tabla "Arbol" tableMatrices
+						// Creación del Item de la Tabla Indices tableMatrices
 						TableItem itemMatrices = new TableItem(tableMatrices,
 								SWT.NONE);
 						itemMatrices.setText("Nueva Matriz "
 								+ arrayListMatriz.size());
 
-						// Creación del Item para el CTabItem, contiene un
-						// índice que indica el número de Matriz
-						CTabItem item = new CTabItem(folder, SWT.NONE);
+						// Creación del Item para el CTabItem
+						CTabItem item = new CTabItem(folder, SWT.CLOSE);
 						item.setText("Matriz " + arrayListMatriz.size());
 						item.setControl(table);
 
@@ -273,15 +193,19 @@ class Interfaz {
 		// Funcion abrir, Abre una Matriz ya existente
 		class abrir implements SelectionListener {
 			public void widgetSelected(SelectionEvent event) {
+				// Creación de un Dialogo para Abrir documentos
 				FileDialog fd = new FileDialog(shell, SWT.OPEN | SWT.CLOSE);
 				fd.setFilterPath("C:/");
 				String[] filterExt = { "*.txt", "*.*" };
 				fd.setFilterExtensions(filterExt);
 				String fichero = fd.open();
+
+				// Si Existe el Fichero
 				if (fichero != null) {
 					obj.leer(fichero);
 
-					// Creación de Tabla
+					// Creación de Tabla para que se muestre la Matriz en el
+					// Folder
 					Table table = new Table(folder, SWT.BORDER | SWT.MULTI);
 
 					// Creación de Columnas
@@ -293,7 +217,7 @@ class Interfaz {
 
 					// Creación de la Matriz
 					for (int i = 0; i < obj.getFilas(); i++) {
-						TableItem item = new TableItem(table, SWT.NONE);
+						TableItem item = new TableItem(table, SWT.CLOSE);
 						for (int j = 0; j < obj.getColumnas(); j++) {
 							item.setText(j,
 									Integer.toString(obj.getMatriz(i, j)));
@@ -304,7 +228,7 @@ class Interfaz {
 					TableItem itemMatrices = new TableItem(tableMatrices,
 							SWT.NONE);
 					itemMatrices
-							.setText("Matriz cargada en la ruta " + fichero);
+					.setText("Matriz cargada en la ruta " + fichero);
 
 					// Creación del Item del TabItem
 					CTabItem item = new CTabItem(folder, SWT.CLOSE);
@@ -327,6 +251,7 @@ class Interfaz {
 		// Funcion guardar, Guarda una Matriz
 		class guardar implements SelectionListener {
 			public void widgetSelected(SelectionEvent event) {
+				// Creación de un Dialogo para Guardar documentos
 				FileDialog fd = new FileDialog(shell, SWT.SAVE);
 				fd.setText("Guardar");
 				fd.setFilterPath("C:/");
@@ -342,6 +267,7 @@ class Interfaz {
 		// Funcion salir, Sale de la Aplicación
 		class salir implements SelectionListener {
 			public void widgetSelected(SelectionEvent event) {
+				// Creación de un Dialogo para Salir del programa
 				MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION
 						| SWT.YES | SWT.NO);
 				messageBox.setMessage(" Seguro que desea Salir?");
@@ -366,17 +292,19 @@ class Interfaz {
 				estadisticas.setText("Estadísticas");
 				estadisticas.setSize(160, 150);
 
-				// Layout
+				// Layout de la Ventana
 				GridLayout gridLayout = new GridLayout();
 				gridLayout.numColumns = 2;
 				gridLayout.makeColumnsEqualWidth = true;
 				estadisticas.setLayout(gridLayout);
 
+				// Creación de Label para mostrar los datos de la Matriz en
+				// Memoria
 				new Label(estadisticas, SWT.NONE).setText("Número de Filas: ");
 				new Label(estadisticas, SWT.NONE).setText(Integer.toString(obj
 						.getFilas()));
 				new Label(estadisticas, SWT.NONE)
-						.setText("Número de Columnas: ");
+				.setText("Número de Columnas: ");
 				new Label(estadisticas, SWT.NONE).setText(Integer.toString(obj
 						.getColumnas()));
 				new Label(estadisticas, SWT.NONE).setText("Número Mínimo: ");
@@ -407,6 +335,7 @@ class Interfaz {
 
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
+
 		}
 
 		// Asignación de Funciones de menuArchivo
@@ -417,8 +346,102 @@ class Interfaz {
 
 		// Asignación de Funciones de menuVisualización
 		menuVisualizacionEstadisticas.addSelectionListener(new estadisticas());
+	}
 
-		shell.setMenuBar(menuBar);
+	public Table creaciontablaIndice(ArrayList<int[][]> arrayListMatriz,
+			ArrayList<Integer> arrayListFilas,
+			ArrayList<Integer> arrayListColumnas, CTabFolder folder,
+			Matriz obj, Shell shell) {
+
+		// Creación de una Tabla que será el "índice" de las Matrices
+		Table tableMatrices = new Table(shell, SWT.BORDER);
+		tableMatrices.setHeaderVisible(true);
+		tableMatrices.setLinesVisible(true);
+
+		// Creación de la única Columna para la Tabla
+		TableColumn column1 = new TableColumn(tableMatrices, SWT.NONE);
+		column1.setText("Índice de Matrices");
+		column1.setWidth(700);
+
+		tableMatrices.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+
+				// Creación de la Tabla para que se muestre la Matriz
+				Table table = new Table(folder, SWT.BORDER | SWT.MULTI);
+				int indice = tableMatrices.getSelectionIndex();
+				System.out.println(indice);
+				// Obtenemos los datos para retornar nuestra Matriz de las
+				// arrays.
+				obj.setMatriz(arrayListMatriz.get(indice),
+						arrayListFilas.get(indice),
+						arrayListColumnas.get(indice));
+
+				// Creación de Columnas
+				for (int j = 0; j < arrayListColumnas.get(indice); j++) {
+					TableColumn column = new TableColumn(table, SWT.BORDER
+							| SWT.MULTI | SWT.V_SCROLL);
+					column.setText((Integer.toString(j)));
+					column.setWidth(30);
+				}
+
+				// Creación de la Matriz
+				for (int i = 0; i < arrayListFilas.get(indice); i++) {
+					TableItem item = new TableItem(table, SWT.NONE);
+					for (int j = 0; j < arrayListColumnas.get(indice); j++) {
+						item.setText(j, Integer.toString(obj.getMatriz(i, j)));
+					}
+				}
+
+				// Creación del Item, en otras palabras, retorna la matriz y la
+				// añade al Tab
+				CTabItem item = new CTabItem(folder, SWT.CLOSE);
+				item.setText("Matriz " + (indice + 1));
+				item.setControl(table);
+
+				// Asignación, asignamos el nFilas y nColumnas a la Matriz que
+				// está en memoria en ese momento
+				obj.setFilas(arrayListFilas.get(indice));
+				obj.setColumnas(arrayListColumnas.get(indice));
+
+			}
+		});
+
+		return tableMatrices;
+	}
+
+	public void Ventana() {
+		// Parametros
+		ArrayList<int[][]> arrayListMatriz = new ArrayList<int[][]>();
+		ArrayList<Integer> arrayListFilas = new ArrayList<Integer>();
+		ArrayList<Integer> arrayListColumnas = new ArrayList<Integer>();
+		Matriz obj = new Matriz();
+		Table tableMatrices;
+
+		// Creación del display y shell
+		Display display = new Display();
+		Shell shell = new Shell(display);
+
+		// Creación de los dos Componentes de la Ventana
+		CTabFolder folder = new CTabFolder(shell, SWT.BORDER);
+		tableMatrices = creaciontablaIndice(arrayListMatriz, arrayListFilas,
+				arrayListColumnas, folder, obj, shell);
+
+		// Parámetros Ventana
+		shell.setText("Ejercicio SWT");
+		shell.setMaximized(true);
+
+		// FillLayout de la Ventana
+		FillLayout fillLayout = new FillLayout(SWT.HORIZONTAL);
+		fillLayout.marginWidth = 5;
+		fillLayout.marginHeight = 5;
+		fillLayout.spacing = 50;
+		shell.setLayout(fillLayout);
+
+		// Menu
+		menu(shell);
+		funcionesMenu(arrayListMatriz, arrayListFilas, arrayListColumnas,
+				folder, obj, tableMatrices);
+
 		shell.open();
 
 		while (!shell.isDisposed()) {
@@ -431,7 +454,7 @@ class Interfaz {
 
 	public static void main(String args[]) {
 		Interfaz obj = new Interfaz();
-		obj.menu();
+		obj.Ventana();
 
 	}
 

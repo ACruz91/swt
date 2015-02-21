@@ -12,35 +12,6 @@ public class Matriz {
 	private int filas, columnas;
 	private int min, max;
 
-	public void crear(int nFilas, int nColumnas) {
-		matriz = new int[nFilas][nColumnas];
-		int nMin, nMax;
-		nMin = nMax = 0;
-		// Este contador sirve para inicializar nMin y nMax al primer numero de
-		// la Matriz, este contador hacer de controlador para que solo entre una
-		// única vez
-		int cont = 0;
-		for (int i = 0; i < nFilas; i++) {
-			for (int j = 0; j < nColumnas; j++) {
-				matriz[i][j] = (int) (Math.random() * 100);
-				if (cont <= 0) {
-					nMin = nMax = matriz[0][0];
-					cont++;
-				}
-				if (nMin > matriz[i][j]) {
-					nMin = matriz[i][j];
-				}
-				if (nMax < matriz[i][j]) {
-					nMax = matriz[i][j];
-				}
-			}
-		}
-		setFilas(nFilas);
-		setColumnas(nColumnas);
-		setMinimo(nMin);
-		setMaximo(nMax);
-	}
-
 	/* Metodos Get */
 	public int[][] getMatrizEntera() {
 		return this.matriz;
@@ -107,6 +78,39 @@ public class Matriz {
 		setMaximo(nMax);
 	}
 
+	/* Funciones de Tratado de Matrices */
+
+	// Crea una Matriz dado las Filas y las Columnas
+	public void crear(int nFilas, int nColumnas) {
+		matriz = new int[nFilas][nColumnas];
+		int nMin, nMax;
+		nMin = nMax = 0;
+		// Este contador sirve para inicializar nMin y nMax al primer numero de
+		// la Matriz, este contador hacer de controlador para que solo entre una
+		// única vez
+		int cont = 0;
+		for (int i = 0; i < nFilas; i++) {
+			for (int j = 0; j < nColumnas; j++) {
+				matriz[i][j] = (int) (Math.random() * 100);
+				if (cont <= 0) {
+					nMin = nMax = matriz[0][0];
+					cont++;
+				}
+				if (nMin > matriz[i][j]) {
+					nMin = matriz[i][j];
+				}
+				if (nMax < matriz[i][j]) {
+					nMax = matriz[i][j];
+				}
+			}
+		}
+		setFilas(nFilas);
+		setColumnas(nColumnas);
+		setMinimo(nMin);
+		setMaximo(nMax);
+	}
+
+	// Lee una Matriz por fichero, dada su ruta
 	public void leer(String fichero) {
 		int nFilas, nColumnas, cont, i, j, nLineas;
 		nFilas = nColumnas = cont = i = j = nLineas = 0;
@@ -184,6 +188,7 @@ public class Matriz {
 		}
 	}
 
+	// Guarda la Matriz en un fichero, dado por una ruta
 	public void guardar(String fichero) {
 		FileWriter fw = null;
 		PrintWriter pw = null;
@@ -220,6 +225,7 @@ public class Matriz {
 		}
 	}
 
+	// Muestra la Matriz por pantalla
 	public void mostrar() {
 		int min, max;
 		min = max = matriz[0][0];
@@ -244,8 +250,8 @@ public class Matriz {
 		System.out.println("---- Estadísticas ---------");
 		System.out.println("---- Número Máximo: " + max);
 		System.out.println("---- Número Mínimo: " + min);
-		System.out.println("---- Número de Filas: " + filas);
-		System.out.println("---- Número de Columnas: " + columnas);
+		System.out.println("---- Número de Filas: " + getFilas());
+		System.out.println("---- Número de Columnas: " + getColumnas());
 		System.out.println("---------------------------");
 	}
 }
