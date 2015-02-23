@@ -30,7 +30,16 @@ class Interfaz {
 	private Menu menuBar, menuArchivo, menuVisualizacion;
 	private MenuItem menuArchivoCabecera, menuVisualizacionCabecera;
 	private MenuItem menuArchivoNuevo, menuArchivoGuardar, menuArchivoSalir,
-	menuArchivoAbrir, menuVisualizacionEstadisticas;
+			menuArchivoAbrir, menuVisualizacionEstadisticas;
+	private static int encontrado = 0;
+	
+	public Shell getShell() {
+		return shell;
+	}
+
+	public void setShell(Shell shell) {
+		this.shell = shell;
+	}
 
 	public void menu(Shell shell) {
 		// Creación del Menú
@@ -85,7 +94,7 @@ class Interfaz {
 	public void funcionesMenu(ArrayList<int[][]> arrayListMatriz,
 			ArrayList<Integer> arrayListFilas,
 			ArrayList<Integer> arrayListColumnas, CTabFolder folder,
-			Matriz obj, Table tableMatrices) {
+			Matriz obj, Table tableMatrices, Shell shell) {
 		class nuevo implements SelectionListener {
 			public void widgetSelected(SelectionEvent event) {
 				// Creación de una Shell hija llamada "nuevo" para el nuevo
@@ -155,14 +164,15 @@ class Interfaz {
 						// Creación del Item de la Tabla Indices tableMatrices
 						TableItem itemMatrices = new TableItem(tableMatrices,
 								SWT.NONE);
-						itemMatrices.setText("Nueva Matriz "
-								+ arrayListMatriz.size());
-
+						itemMatrices.setText("Matriz " + arrayListMatriz.size());
 						// Creación del Item para el CTabItem
 						CTabItem item = new CTabItem(folder, SWT.CLOSE);
 						item.setText("Matriz " + arrayListMatriz.size());
-						item.setControl(table);
 
+						// Para que se muestre automaticamente la Matriz
+						item.setControl(table);
+						folder.showItem(item);
+						folder.setSelection(item);
 						nuevo.close();
 					}
 
@@ -227,13 +237,16 @@ class Interfaz {
 					// Creación del Item de la Tabla "Arbol" tableMatrices
 					TableItem itemMatrices = new TableItem(tableMatrices,
 							SWT.NONE);
-					itemMatrices
-					.setText("Matriz cargada en la ruta " + fichero);
+					itemMatrices.setText(fichero);
 
 					// Creación del Item del TabItem
 					CTabItem item = new CTabItem(folder, SWT.CLOSE);
+
+					// Para que se muestre automaticamente la Matriz
 					item.setText(fichero);
 					item.setControl(table);
+					folder.showItem(item);
+					folder.setSelection(item);
 
 					// Añadimos en nuestros vectores los datos que queremos
 					// retornar
@@ -304,7 +317,7 @@ class Interfaz {
 				new Label(estadisticas, SWT.NONE).setText(Integer.toString(obj
 						.getFilas()));
 				new Label(estadisticas, SWT.NONE)
-				.setText("Número de Columnas: ");
+						.setText("Número de Columnas: ");
 				new Label(estadisticas, SWT.NONE).setText(Integer.toString(obj
 						.getColumnas()));
 				new Label(estadisticas, SWT.NONE).setText("Número Mínimo: ");
@@ -369,7 +382,7 @@ class Interfaz {
 				// Creación de la Tabla para que se muestre la Matriz
 				Table table = new Table(folder, SWT.BORDER | SWT.MULTI);
 				int indice = tableMatrices.getSelectionIndex();
-				System.out.println(indice);
+
 				// Obtenemos los datos para retornar nuestra Matriz de las
 				// arrays.
 				obj.setMatriz(arrayListMatriz.get(indice),
@@ -392,11 +405,66 @@ class Interfaz {
 					}
 				}
 
-				// Creación del Item, en otras palabras, retorna la matriz y la
-				// añade al Tab
-				CTabItem item = new CTabItem(folder, SWT.CLOSE);
-				item.setText("Matriz " + (indice + 1));
-				item.setControl(table);
+				// Comprobación de si existe una pestaña existente para retornar
+				// la Matriz
+				if (folder.getItems().length == 0) {
+					for (int i = 0; i < folder.getItems().length - 1; i++) {
+						System.out.println("Se va ha comprobar el item " + i
+								+ " : " + folder.getItem(i).getText());
+						if (tableMatrices.getItem(indice).getText()
+								.equals(folder.getItem(i).getText()) == false) {
+							System.out.println("En la posicion " + i
+									+ " del Item: "
+									+ folder.getItem(i).getText() + " No está "
+									+ tableMatrices.getItem(indice).getText());
+							encontrado = 0;
+
+						} else {
+							System.out.println("Se ha encontrado: "
+									+ folder.getItem(i).getText());
+							encontrado = 1;
+
+						}
+					}
+				} else {
+					for (int i = 0; i < folder.getItems().length; i++) {
+						System.out.println("Se va ha comprobar el item " + i
+								+ " : " + folder.getItem(i).getText());
+						if (tableMatrices.getItem(indice).getText()
+								.equals(folder.getItem(i).getText()) == false) {
+							System.out.println("En la posicion " + i
+									+ " del Item: "
+									+ folder.getItem(i).getText() + " No está "
+									+ tableMatrices.getItem(indice).getText());
+							encontrado = 0;
+
+						} else {
+							System.out.println("Se ha encontrado: "
+									+ folder.getItem(i).getText());
+							encontrado = 1;
+							break;
+
+						}
+					}
+				}
+
+				if (encontrado == 0) {
+					CTabItem item = new CTabItem(folder, SWT.CLOSE);
+					item.setText(tableMatrices.getItem(indice).getText());
+					item.setControl(table);
+					folder.showItem(item);
+					folder.setSelection(item);
+					encontrado = 0;
+				}
+
+				if (folder.getItemCount() == 0) {
+					CTabItem item = new CTabItem(folder, SWT.CLOSE);
+					item.setText(tableMatrices.getItem(indice).getText());
+					item.setControl(table);
+					folder.showItem(item);
+					folder.setSelection(item);
+					encontrado = 0;
+				}
 
 				// Asignación, asignamos el nFilas y nColumnas a la Matriz que
 				// está en memoria en ese momento
@@ -440,7 +508,7 @@ class Interfaz {
 		// Menu
 		menu(shell);
 		funcionesMenu(arrayListMatriz, arrayListFilas, arrayListColumnas,
-				folder, obj, tableMatrices);
+				folder, obj, tableMatrices, shell);
 
 		shell.open();
 
@@ -457,5 +525,7 @@ class Interfaz {
 		obj.Ventana();
 
 	}
+
+
 
 }
