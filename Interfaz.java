@@ -159,7 +159,7 @@ public class Interfaz {
 						// creada
 						for (int i = 0; i < obj.getFilas(); i++) {
 							TableItem item = new TableItem(table, SWT.NONE);
-							for (int j = 0; j < obj.getFilas(); j++) {
+							for (int j = 0; j < obj.getColumnas(); j++) {
 								item.setText(j,
 										Integer.toString(obj.getMatriz(i, j)));
 							}
