@@ -25,13 +25,13 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-class Interfaz {
+public class Interfaz {
 	private Shell shell;
 	private Menu menuBar, menuArchivo, menuVisualizacion;
 	private MenuItem menuArchivoCabecera, menuVisualizacionCabecera;
 	private MenuItem menuArchivoNuevo, menuArchivoGuardar, menuArchivoSalir,
 			menuArchivoAbrir, menuVisualizacionEstadisticas;
-	private static int encontrado = 0;
+	private int encontrado = 0;
 	
 	public Shell getShell() {
 		return shell;
@@ -520,12 +520,10 @@ class Interfaz {
 
 	}
 
-	public static void main(String args[]) {
+	public static  void main(String args[]) {
 		Interfaz obj = new Interfaz();
 		obj.Ventana();
 
 	}
-
-
 
 }
