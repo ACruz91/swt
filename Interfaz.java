@@ -30,9 +30,9 @@ public class Interfaz {
 	private Menu menuBar, menuArchivo, menuVisualizacion;
 	private MenuItem menuArchivoCabecera, menuVisualizacionCabecera;
 	private MenuItem menuArchivoNuevo, menuArchivoGuardar, menuArchivoSalir,
-			menuArchivoAbrir, menuVisualizacionEstadisticas;
+	menuArchivoAbrir, menuVisualizacionEstadisticas;
 	private int encontrado = 0;
-	
+
 	public Shell getShell() {
 		return shell;
 	}
@@ -135,8 +135,18 @@ public class Interfaz {
 						// Matriz
 						obj.setFilas(Integer.parseInt(textFilas.getText()));
 						obj.setColumnas(Integer.parseInt(textColumnas.getText()));
+						
+						// Valores por Defecto en caso de 0 o menos
+						if (obj.getFilas() <= 0) {
+							obj.setFilas(1);
+						}
+						if (obj.getColumnas() <= 0) {
+							obj.setColumnas(1);
+						}
+						
 						obj.crear(obj.getFilas(), obj.getColumnas());
 
+	
 						// Creación de Columnas
 						for (int j = 0; j < obj.getColumnas(); j++) {
 							TableColumn column = new TableColumn(table,
@@ -317,7 +327,7 @@ public class Interfaz {
 				new Label(estadisticas, SWT.NONE).setText(Integer.toString(obj
 						.getFilas()));
 				new Label(estadisticas, SWT.NONE)
-						.setText("Número de Columnas: ");
+				.setText("Número de Columnas: ");
 				new Label(estadisticas, SWT.NONE).setText(Integer.toString(obj
 						.getColumnas()));
 				new Label(estadisticas, SWT.NONE).setText("Número Mínimo: ");
@@ -520,7 +530,7 @@ public class Interfaz {
 
 	}
 
-	public static  void main(String args[]) {
+	public static void main(String args[]) {
 		Interfaz obj = new Interfaz();
 		obj.Ventana();
 
